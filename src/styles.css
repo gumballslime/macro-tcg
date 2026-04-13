@@ -1,0 +1,406 @@
+/* ═══════════════════════════════════════════════════════════════
+   MACRO TCG — Design System
+   FT/Economist editorial aesthetic. Not Bloomberg.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --bg-paper:      #FDF6EC;
+  --bg-surface:    #F5EDE0;
+  --bg-inset:      #EDE4D4;
+  --text-primary:  #1A1A2E;
+  --text-body:     #3D3D4E;
+  --text-caption:  #8A8A96;
+  --accent-salmon: #D4614D;
+  --accent-teal:   #1B8A7A;
+  --accent-navy:   #2D3A5C;
+  --pnl-positive:  #1B8A7A;
+  --pnl-negative:  #D4614D;
+  --indicator-bg:  #2D3A5C;
+
+  /* Desk colours */
+  --desk-rates:       #2D3A5C;
+  --desk-equities:    #1B8A7A;
+  --desk-commodities: #C4851C;
+  --desk-fx:          #7B5EA7;
+  --desk-macro:       #D4614D;
+
+  /* Typography */
+  --font-headline: 'Fraunces', serif;
+  --font-body:     'Literata', serif;
+  --font-mono:     'Commit Mono', monospace;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+
+  /* Borders */
+  --border-light: 1px solid rgba(26, 26, 46, 0.1);
+  --border-medium: 1px solid rgba(26, 26, 46, 0.2);
+}
+
+/* ─── Reset ──────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-body);
+  background-color: var(--bg-paper);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ─── Typography ─────────────────────────────────────────── */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-headline);
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.4rem;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 1.2rem;
+}
+
+h4 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.caption {
+  font-size: 0.75rem;
+  color: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ─── Editorial Layout ───────────────────────────────────── */
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-md);
+}
+
+.masthead {
+  text-align: center;
+  padding: var(--space-lg) 0 var(--space-md);
+  border-bottom: 3px double var(--text-primary);
+  margin-bottom: var(--space-lg);
+}
+
+.masthead h1 {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.masthead .edition {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--text-caption);
+  margin-top: var(--space-xs);
+}
+
+/* ─── Surfaces ───────────────────────────────────────────── */
+
+.surface {
+  background: var(--bg-surface);
+  border: var(--border-light);
+  padding: var(--space-md);
+}
+
+.inset {
+  background: var(--bg-inset);
+  border: var(--border-light);
+  padding: var(--space-md);
+}
+
+/* ─── Buttons ────────────────────────────────────────────── */
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--accent-navy);
+  color: var(--bg-paper);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.btn-primary:hover {
+  background: var(--text-primary);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--accent-navy);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid var(--accent-navy);
+}
+
+.btn-secondary:hover {
+  background: var(--accent-navy);
+  color: var(--bg-paper);
+}
+
+.btn-salmon {
+  background: var(--accent-salmon);
+  color: var(--bg-paper);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.btn-salmon:hover {
+  filter: brightness(1.1);
+}
+
+/* ─── Card Styling ───────────────────────────────────────── */
+
+.card {
+  background: var(--bg-paper);
+  border: var(--border-medium);
+  padding: var(--space-sm) var(--space-md);
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.1);
+}
+
+.card.selected {
+  box-shadow: 0 0 0 2px var(--accent-salmon), 0 4px 16px rgba(212, 97, 77, 0.2);
+  transform: translateY(-4px);
+}
+
+.card.frozen {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+
+/* ─── Indicator Gauge ────────────────────────────────────── */
+
+.gauge {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.gauge-segment {
+  width: 18px;
+  height: 6px;
+  background: rgba(26, 26, 46, 0.1);
+  transition: background 0.3s ease;
+}
+
+.gauge-segment.filled {
+  background: var(--indicator-bg);
+}
+
+/* ─── Chip / Badge ───────────────────────────────────────── */
+
+.chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  background: var(--bg-inset);
+  border: var(--border-light);
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  background: var(--bg-inset);
+  border: var(--border-light);
+}
+
+/* ─── Lane Row ───────────────────────────────────────────── */
+
+.lane-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 1fr;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+  border-bottom: var(--border-light);
+  min-height: 60px;
+  align-items: start;
+}
+
+.lane-label {
+  font-family: var(--font-headline);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-caption);
+  padding-top: var(--space-sm);
+}
+
+.lane-side {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  min-height: 50px;
+  padding: var(--space-xs);
+  border: 1px dashed transparent;
+  transition: border-color 0.15s ease;
+}
+
+.lane-side.droppable {
+  border-color: var(--accent-salmon);
+  background: rgba(212, 97, 77, 0.04);
+}
+
+.lane-side.droppable:hover {
+  background: rgba(212, 97, 77, 0.08);
+  cursor: pointer;
+}
+
+/* ─── Score Display ──────────────────────────────────────── */
+
+.score-display {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.score-positive {
+  color: var(--pnl-positive);
+}
+
+.score-negative {
+  color: var(--pnl-negative);
+}
+
+/* ─── Game Log ───────────────────────────────────────────── */
+
+.game-log {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.6;
+  color: var(--text-caption);
+  max-height: 200px;
+  overflow-y: auto;
+  padding: var(--space-sm);
+  background: var(--bg-inset);
+  border: var(--border-light);
+}
+
+.game-log p {
+  padding: 1px 0;
+  border-bottom: 1px solid rgba(26, 26, 46, 0.05);
+}
+
+/* ─── Transmission Chain ─────────────────────────────────── */
+
+.transmission-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--text-primary);
+  color: var(--bg-paper);
+  padding: var(--space-sm) var(--space-lg);
+  z-index: 100;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.transmission-step {
+  padding: 2px 0;
+  opacity: 0;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-inset);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-caption);
+}
+
+/* ─── Utility ────────────────────────────────────────────── */
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+.text-center { text-align: center; }
+.w-full { width: 100%; }
