@@ -6,8 +6,6 @@
 import { GameState, CardInstance, Lane, Action, STARTING_INDICATORS } from './types';
 import { CARD_MAP } from './cards';
 import { uid } from './engine';
-import { applyAction } from './engine';
-
 // ─── Step Definitions ────────────────────────────────────────
 
 export type TutorialAction = 'play_position' | 'play_catalyst' | 'wait_ai' | 'player_pass';
@@ -252,4 +250,3 @@ export function getTutorialAIAction(state: GameState, aiTurnIndex: number): Acti
   return { type: 'play_card', instanceId: card.instanceId, lane: move.lane };
 }
 
-export { applyAction };

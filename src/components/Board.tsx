@@ -25,6 +25,17 @@ interface Props {
   transmissionSteps: GameState['transmissionSteps'];
   showingTransmission: boolean;
   onTransmissionComplete: () => void;
+  tutorialHighlight?: string;
+}
+
+function tutorialGlow(highlight: string | undefined, zone: string): React.CSSProperties {
+  if (highlight !== zone) return {};
+  return {
+    outline: '2px solid var(--accent-teal)',
+    outlineOffset: '2px',
+    boxShadow: '0 0 0 4px rgba(27,138,122,0.2)',
+    animation: 'tutorialPulse 1.5s ease-in-out infinite',
+  };
 }
 
 export default function Board({
@@ -33,6 +44,7 @@ export default function Board({
   transmissionSteps,
   showingTransmission,
   onTransmissionComplete,
+  tutorialHighlight,
 }: Props) {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [modalCard, setModalCard] = useState<CardInstance | null>(null);
@@ -96,13 +108,16 @@ export default function Board({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
       {/* Indicator Panel */}
-      <IndicatorPanel indicators={state.indicators} />
+      <div style={{ ...tutorialGlow(tutorialHighlight, 'indicators') }}>
+        <IndicatorPanel indicators={state.indicators} />
+      </div>
 
       {/* AI Hand */}
       <div style={{
         padding: 'var(--space-sm) var(--space-md)',
         background: 'rgba(26,26,46,0.04)',
         borderBottom: 'var(--border-medium)',
+        ...tutorialGlow(tutorialHighlight, 'ai-hand'),
       }}>
         <div style={{
           fontFamily: 'var(--font-mono)',
@@ -211,7 +226,11 @@ export default function Board({
             className="btn-salmon"
             onClick={handlePass}
             disabled={disabled}
-            style={{ fontSize: '0.75rem', padding: '4px 16px' }}
+            style={{
+              fontSize: '0.75rem',
+              padding: '4px 16px',
+              ...tutorialGlow(tutorialHighlight, 'pass-button'),
+            }}
           >
             Pass
           </button>
@@ -252,6 +271,7 @@ export default function Board({
                 background: `${laneColor}06`,
                 minHeight: '68px',
                 alignItems: 'start',
+                ...(tutorialHighlight === lane ? tutorialGlow(tutorialHighlight, lane) : {}),
               }}
             >
               {/* Lane label */}
@@ -328,7 +348,12 @@ export default function Board({
       </div>
 
       {/* Player Hand */}
-      <div style={{ padding: 'var(--space-md)', background: 'var(--bg-surface)', borderTop: 'var(--border-medium)' }}>
+      <div style={{
+        padding: 'var(--space-md)',
+        background: 'var(--bg-surface)',
+        borderTop: 'var(--border-medium)',
+        ...tutorialGlow(tutorialHighlight, 'hand'),
+      }}>
         <Hand
           cards={player.hand}
           indicators={state.indicators}
