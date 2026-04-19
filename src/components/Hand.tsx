@@ -5,10 +5,11 @@ interface Props {
   cards: CardInstance[];
   indicators: Indicators;
   selectedId: string | null;
+  capital: number;
   onCardClick: (card: CardInstance) => void;
 }
 
-export default function Hand({ cards, indicators, selectedId, onCardClick }: Props) {
+export default function Hand({ cards, indicators, selectedId, capital, onCardClick }: Props) {
   return (
     <div>
       <div style={{
@@ -18,8 +19,12 @@ export default function Hand({ cards, indicators, selectedId, onCardClick }: Pro
         letterSpacing: '0.1em',
         color: 'var(--text-caption)',
         marginBottom: 'var(--space-sm)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
       }}>
-        Your Hand ({cards.length} cards) — click a card to view &amp; play
+        <span>Your Hand ({cards.length} cards) — click a card to view &amp; play</span>
+        <span style={{ color: '#C4851C', fontWeight: 700 }}>Capital: {capital}$</span>
       </div>
       <div style={{
         display: 'flex',

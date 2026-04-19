@@ -3,16 +3,19 @@ import { Indicators, IndicatorKey, INDICATOR_META } from '../types';
 
 interface Props {
   indicators: Indicators;
+  difficulty?: 'easy' | 'normal' | 'advanced';
 }
 
-const KEYS: IndicatorKey[] = ['rate', 'inflation', 'usd', 'risk'];
-const SEGMENTS = 6; // 0-5 inclusive
+const ALL_KEYS: IndicatorKey[] = ['rate', 'inflation', 'usd', 'risk'];
+const EASY_KEYS: IndicatorKey[] = ['rate', 'risk'];
+const SEGMENTS = 11; // 0-10 inclusive
 
-export default function IndicatorPanel({ indicators }: Props) {
+export default function IndicatorPanel({ indicators, difficulty }: Props) {
+  const KEYS = difficulty === 'easy' ? EASY_KEYS : ALL_KEYS;
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
+      gridTemplateColumns: `repeat(${KEYS.length}, 1fr)`,
       gap: 'var(--space-md)',
       padding: 'var(--space-md)',
       background: 'var(--bg-surface)',
@@ -62,7 +65,7 @@ export default function IndicatorPanel({ indicators }: Props) {
                     }}
                     transition={{ duration: 0.4, ease: 'easeOut' }}
                     style={{
-                      width: '16px',
+                      width: '9px',
                       height: '6px',
                     }}
                   />

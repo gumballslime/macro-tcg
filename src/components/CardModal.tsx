@@ -52,21 +52,23 @@ export default function CardModal({ card, indicators, onClose, onPlay }: Props) 
         }}
       />
 
-      {/* Card */}
+      {/* Centering wrapper — separate from animation so Framer doesn't clobber translate */}
+      <div style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 201,
+        width: '340px',
+        maxWidth: '92vw',
+      }}>
       <motion.div
         key="modal"
-        initial={{ scale: 0.88, opacity: 0, y: 24 }}
+        initial={{ scale: 0.88, opacity: 0, y: 16 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.88, opacity: 0, y: 24 }}
+        exit={{ scale: 0.88, opacity: 0, y: 16 }}
         transition={{ type: 'spring', damping: 22, stiffness: 320 }}
         style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 201,
-          width: '340px',
-          maxWidth: '92vw',
           maxHeight: '90vh',
           overflowY: 'auto',
           background: 'var(--bg-paper)',
@@ -203,7 +205,7 @@ export default function CardModal({ card, indicators, onClose, onPlay }: Props) 
             {def.description}
           </div>
 
-          {/* Transmission chain */}
+          {/* How it works */}
           {def.chain && (
             <div style={{
               borderLeft: `3px solid ${deskColor}`,
@@ -218,7 +220,7 @@ export default function CardModal({ card, indicators, onClose, onPlay }: Props) 
                 color: 'var(--text-caption)',
                 marginBottom: '5px',
               }}>
-                Transmission Chain
+                How It Works
               </div>
               <div style={{
                 fontFamily: 'var(--font-body)',
@@ -243,7 +245,7 @@ export default function CardModal({ card, indicators, onClose, onPlay }: Props) 
                 color: 'var(--text-caption)',
                 marginBottom: '7px',
               }}>
-                When Played — Indicator Changes
+                When Played — Moves These Indicators
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                 {indicatorChangeEntries.map(([k, v]) => (
@@ -264,7 +266,7 @@ export default function CardModal({ card, indicators, onClose, onPlay }: Props) 
             </div>
           )}
 
-          {/* Sensitivities */}
+          {/* P&L Drivers */}
           {sensKeys.length > 0 && (
             <div style={{ marginBottom: '14px' }}>
               <div style={{
@@ -275,23 +277,24 @@ export default function CardModal({ card, indicators, onClose, onPlay }: Props) 
                 color: 'var(--text-caption)',
                 marginBottom: '7px',
               }}>
-                Sensitivities — P&L per +1 indicator move
+                P&L Drivers — how indicators affect this card
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {sensKeys.map(k => {
                   const val = sensitivities![k]!;
                   return (
-                    <span key={k} style={{
+                    <div key={k} style={{
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '0.68rem',
-                      padding: '3px 10px',
+                      fontSize: '0.65rem',
+                      padding: '4px 10px',
                       background: `${SENS_COLORS[k]}14`,
                       border: `1px solid ${SENS_COLORS[k]}40`,
                       color: SENS_COLORS[k],
                       borderRadius: '2px',
+                      lineHeight: 1.5,
                     }}>
-                      {INDICATOR_META[k].name} {val > 0 ? '+' : ''}{val}
-                    </span>
+                      {INDICATOR_META[k].icon} {INDICATOR_META[k].name} ↑1 → {val > 0 ? '+' : ''}{val} P&L · ↓1 → {val > 0 ? '-' : '+'}{Math.abs(val)} P&L
+                    </div>
                   );
                 })}
               </div>
@@ -360,6 +363,7 @@ export default function CardModal({ card, indicators, onClose, onPlay }: Props) 
           )}
         </div>
       </motion.div>
+      </div>
     </AnimatePresence>
   );
 }

@@ -1,7 +1,8 @@
 // ═══════════════════════════════════════════════════════════════
-//  MACRO v2 — Core Types
-//  Cards move indicators. Indicators affect positions. Players
-//  see the chain. That's how you learn macro.
+//  MACRO COMBAT — Core Types
+//  Hybrid: indicator loop (macro-tcg) + combat layer (YuGiOh-style)
+//  Cards move indicators. Indicators affect ATK/DEF. Positions fight.
+//  Traps set up macro conditions that detonate opponent strategies.
 // ═══════════════════════════════════════════════════════════════
 
 export type Desk = 'rates' | 'equities' | 'commodities' | 'fx' | 'macro';
@@ -13,17 +14,17 @@ export const LANES: Lane[] = ['rates', 'equities', 'commodities', 'fx'];
 // ─── Macro Indicators ────────────────────────────────────────
 
 export interface Indicators {
-  rate: number;       // 0–5. Fed funds rate. Higher = tighter money.
-  inflation: number;  // 0–5. CPI / price pressure.
-  usd: number;        // 0–5. Dollar strength. 3 = neutral.
-  risk: number;       // 0–5. Market sentiment. 0=fear, 5=greed.
+  rate: number;       // 0–10. Fed funds rate. Higher = tighter money.
+  inflation: number;  // 0–10. CPI / price pressure.
+  usd: number;        // 0–10. Dollar strength. 5 = neutral.
+  risk: number;       // 0–10. Market sentiment. 0=fear, 10=greed.
 }
 
 export const STARTING_INDICATORS: Indicators = {
-  rate: 2,
-  inflation: 2,
-  usd: 3,
-  risk: 3,
+  rate: 4,
+  inflation: 4,
+  usd: 5,
+  risk: 6,
 };
 
 export const INDICATOR_META: Record<IndicatorKey, { name: string; icon: string; low: string; high: string }> = {
@@ -34,8 +35,7 @@ export const INDICATOR_META: Record<IndicatorKey, { name: string; icon: string; 
 };
 
 // ─── Sensitivities ───────────────────────────────────────────
-// How much a position's P&L changes per +1 move in each indicator
-// (relative to starting values — at game start, sensitivity contribution = 0)
+// How much a position's P&L (and ATK) shifts per +1 move in each indicator.
 
 export interface Sensitivities {
   rate?: number;
@@ -44,24 +44,41 @@ export interface Sensitivities {
   risk?: number;
 }
 
+// ─── Trap Conditions ─────────────────────────────────────────
+// Trap cards sit face-down and auto-trigger when their condition is met.
+
+export type TrapCondition =
+  | { type: 'indicator_above'; indicator: IndicatorKey; threshold: number }
+  | { type: 'indicator_below'; indicator: IndicatorKey; threshold: number }
+  | { type: 'opponent_plays_position' };
+
 // ─── Card Definitions ────────────────────────────────────────
 
 export interface CardDef {
   id: string;
   name: string;
   desk: Desk;
-  type: 'position' | 'catalyst';
+  // position = stays on board, earns P&L
+  // catalyst = consumed on play, immediate effect
+  // quickplay = like catalyst but can be activated during opponent's turn (⚡)
+  // trap = set face-down, auto-triggers on condition
+  type: 'position' | 'catalyst' | 'quickplay' | 'trap';
   lane: Lane | 'any';
   basePnL: number;
+  cost: number;              // capital cost to play
   sensitivities?: Sensitivities;
-  indicatorChanges?: Partial<Indicators>;       // how this card moves indicators (catalysts + some deploys)
+  indicatorChanges?: Partial<Indicators>;
+  laggedIndicatorChanges?: Partial<Indicators>; // fires after lagTurns (teaches policy lags)
+  lagTurns?: number;                            // how many turns until lagged effect fires (default 1)
+  regimeEffects?: RegimeEffect[];               // conditional overrides (teaches non-linearity)
   description: string;
-  chain?: string;                                // transmission chain explanation
+  chain?: string;
   art: string;
-  keywords: string[];                            // 'immunity', 'short', 'em', 'stable'
-  turnEffect?: string;                           // e.g. 'growth_2', 'growth_1', 'random_indicator', 'chaos'
-  quarterEndEffect?: string;                     // e.g. 'destroy_40', 'destroy_70_risk'
-  directEffect?: string;                         // special catalyst effects beyond indicators
+  keywords: string[];     // 'immunity', 'short', 'em', 'stable'
+  turnEffect?: string;
+  quarterEndEffect?: string;
+  directEffect?: string;
+  trapCondition?: TrapCondition;
 }
 
 // ─── Card Instance (in-game) ─────────────────────────────────
@@ -69,9 +86,11 @@ export interface CardDef {
 export interface CardInstance {
   instanceId: string;
   defId: string;
-  currentPnL: number;    // starts at basePnL, modified only by direct effects
+  currentPnL: number;
   lane?: Lane;
-  frozen?: number;       // turns remaining of sanctions freeze
+  frozen?: number;      // turns remaining frozen
+  faceDown?: boolean;   // true while trap/quickplay is set but not yet revealed
+  leverage?: 1 | 2 | 3; // leverage multiplier for positions
 }
 
 // ─── Player State ────────────────────────────────────────────
@@ -80,18 +99,40 @@ export interface PlayerState {
   desk: Desk;
   hand: CardInstance[];
   board: Record<Lane, CardInstance[]>;
+  trapZone: CardInstance[];   // face-down set cards (max 3)
   passed: boolean;
+  skipsUsed: number;          // max 2 skips per quarter
   quarterWins: number;
+  capital: number;            // current capital for playing cards
 }
 
 // ─── Transmission Steps (for animation) ──────────────────────
 
 export interface TransmissionStep {
-  type: 'indicator_change' | 'auto_trigger' | 'position_effect' | 'direct_effect' | 'chain_text';
+  type: 'indicator_change' | 'auto_trigger' | 'position_effect' | 'direct_effect' | 'chain_text' | 'liquidation' | 'carrying_cost';
   indicator?: IndicatorKey;
   from?: number;
   to?: number;
   reason: string;
+}
+
+// ─── Regime Effects ─────────────────────────────────────────
+
+export interface RegimeEffect {
+  condition: { indicator: IndicatorKey; op: '>=' | '<=' | '=='; value: number };
+  label: string;
+  indicatorOverride?: Partial<Indicators>;
+  pnlModifier?: number;
+  description: string;
+}
+
+// ─── Lagged Effects ─────────────────────────────────────────
+
+export interface LaggedEffect {
+  turnsRemaining: number;
+  indicatorChanges: Partial<Indicators>;
+  reason: string;
+  sourceCardName: string;
 }
 
 // ─── Game State ──────────────────────────────────────────────
@@ -102,15 +143,23 @@ export interface GameState {
   quarter: number;
   indicators: Indicators;
   triggeredThisQuarter: string[];
+  laggedEffects: LaggedEffect[];
   log: string[];
   transmissionSteps: TransmissionStep[];
   phase: 'mode_select' | 'desk_select' | 'playing' | 'quarter_end' | 'game_over';
   winner: 0 | 1 | null;
   turnNumber: number;
+  maxQuarters?: number;
+  difficulty: 'easy' | 'normal' | 'advanced';
+  aiLevel: 'passive' | 'standard' | 'aggressive';
 }
 
 export type Action =
-  | { type: 'play_card'; instanceId: string; lane: Lane }
+  | { type: 'play_card'; instanceId: string; lane: Lane; leverage?: 1 | 2 | 3 }
+  | { type: 'set_card'; instanceId: string }
+  | { type: 'activate_quickplay'; instanceId: string }
+  | { type: 'inspect_order'; instanceId: string }
+  | { type: 'skip' }
   | { type: 'pass' };
 
 // ─── Desk Metadata ───────────────────────────────────────────
